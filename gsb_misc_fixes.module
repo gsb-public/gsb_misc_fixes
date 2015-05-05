@@ -13,3 +13,20 @@ function gsb_misc_fixes_menufix_node_submit($form, &$form_state) {
 		unset($form_state['values']['menu']);
 	}
 }
+
+/**
+ * Implements hook_url_outbound_alter().
+ *
+ * Adds the fragment portion of the url to the options array.
+ */
+function gsb_theme_url_outbound_alter(&$path, &$options, $original_path) {
+  $url = parse_url($original_path);
+  if (isset($url['fragment'])){
+    //set path without the fragment
+    $path = $url['path'];
+    //prevent URL from re-aliasing
+    $options['alias'] = TRUE;
+    //set fragment
+    $options['fragment'] = $url['fragment'];
+  }
+}
