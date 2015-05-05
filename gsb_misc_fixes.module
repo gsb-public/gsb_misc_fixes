@@ -4,14 +4,14 @@
  * Implements hook_form_FORM_ID_alter().
  */
 function gsb_misc_fixes_form_node_form_alter(&$form, &$form_state) {
-	$form['#submit'][] = 'gsb_misc_fixes_menufix_node_submit';
+  $form['#submit'][] = 'gsb_misc_fixes_menufix_node_submit';
 }
 
 function gsb_misc_fixes_menufix_node_submit($form, &$form_state) {
-	if (!user_access('administer menu') && !empty($form['#node']->menu['mlid'])) {
-		$form_state['node']->menu['enabled'] = 1;
-		unset($form_state['values']['menu']);
-	}
+  if (!user_access('administer menu') && !empty($form['#node']->menu['mlid'])) {
+    $form_state['node']->menu['enabled'] = 1;
+    unset($form_state['values']['menu']);
+  }
 }
 
 /**
