@@ -19,14 +19,25 @@ function gsb_misc_fixes_menufix_node_submit($form, &$form_state) {
  *
  * Adds the fragment portion of the url to the options array.
  */
-function gsb_theme_url_outbound_alter(&$path, &$options, $original_path) {
-  $url = parse_url($original_path);
-  if (isset($url['fragment'])){
-    //set path without the fragment
-    $path = $url['path'];
-    //prevent URL from re-aliasing
-    $options['alias'] = TRUE;
-    //set fragment
-    $options['fragment'] = $url['fragment'];
+function gsb_misc_fixes_url_outbound_alter(&$path, &$options, $original_path) {
+  if (!$options['external']) {
+    $url = parse_url($original_path);
+    if (isset($url['fragment'])){
+      // set path without the fragment
+      $path = $url['path'];
+      // prevent URL from re-aliasing
+      $options['alias'] = TRUE;
+      // set fragment
+      $options['fragment'] = $url['fragment'];
+      // set query params as key value pairs
+      if (!empty($url['query'])) {
+        $params = explode('&', $url['query']);
+        foreach($params as $param) {
+          list($k, $v) = explode('=', $param);
+          $query[$k] = $v;
+        }
+        $options['query'] = $query;
+      }
+    }
   }
 }
