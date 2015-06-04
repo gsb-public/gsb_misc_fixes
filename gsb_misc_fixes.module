@@ -41,3 +41,22 @@ function gsb_misc_fixes_url_outbound_alter(&$path, &$options, $original_path) {
     }
   }
 }
+/**
+ * Implements hook_block_view_alter().
+ *
+ * Removes any link in menu_block(29) that links to the node of the current page.
+ */
+function gsb_misc_fixes_block_view_alter(&$data, $block) {
+  if ($block->module != 'menu_block' || $block->delta != '29') {
+    return;
+  }
+  if (arg(0) == 'node' && is_numeric(arg(1))) {
+    $nid = arg(1);
+    foreach ($data['content']['#content'] as $key => $value) {
+      if (!empty($data['content']['#content'][$key]['#href']) && $data['content']['#content'][$key]['#href'] == 'node/' . $nid) {
+        unset($data['content']['#content'][$key]);
+        break;
+      }
+    }
+  }
+}
