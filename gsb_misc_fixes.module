@@ -60,3 +60,17 @@ function gsb_misc_fixes_block_view_alter(&$data, $block) {
     }
   }
 }
+/**
+ * Inserts $item into the associative array after $in_array[$id] 
+ */
+function gsb_misc_fixes_associative_insert($in_array, $id, $item) {
+  $out_array = array();
+  foreach ($in_array as $key => $value) {
+    $out_array[$key] = $value;
+    if ($key === $id) {
+      $item_key = key($item);
+      $out_array[$item_key] = $item[$item_key];
+    }
+  }
+  return $out_array;
+}
