@@ -44,18 +44,23 @@ function gsb_misc_fixes_url_outbound_alter(&$path, &$options, $original_path) {
 /**
  * Implements hook_block_view_alter().
  *
- * Removes any link in menu_block(29 or 36) that links to the node of the current page.
+ * If the 'Hide current page link' is set, then remove any link in
+ * menu_block that links to the node of the current page.
  */
 function gsb_misc_fixes_block_view_alter(&$data, $block) {
-  if ($block->module != 'menu_block' || ($block->delta != '29' && $block->delta != '36'))  {
+  if ($block->module != 'menu_block') {
     return;
   }
-  if (arg(0) == 'node' && is_numeric(arg(1))) {
-    $nid = arg(1);
-    foreach ($data['content']['#content'] as $key => $value) {
-      if (!empty($data['content']['#content'][$key]['#href']) && $data['content']['#content'][$key]['#href'] == 'node/' . $nid) {
-        unset($data['content']['#content'][$key]);
-        break;
+  $menu_block_key = 'menu_block_' . $block->delta . '_hide_current_page_link';
+  $hide_current_page_link = variable_get($menu_block_key, FALSE);
+  if ($hide_current_page_link) {
+    if (arg(0) == 'node' && is_numeric(arg(1))) {
+      $nid = arg(1);
+      foreach ($data['content']['#content'] as $key => $value) {
+        if (!empty($data['content']['#content'][$key]['#href']) && $data['content']['#content'][$key]['#href'] == 'node/' . $nid) {
+          unset($data['content']['#content'][$key]);
+          break;
+        }
       }
     }
   }
@@ -73,4 +78,35 @@ function gsb_misc_fixes_associative_insert($in_array, $id, $item) {
     }
   }
   return $out_array;
+}
+
+/**
+  * Implements hook_form_FORM_ID_alter().
+  */
+function gsb_misc_fixes_form_block_admin_configure_alter(&$form, &$form_state) {
+  if ($form['#id'] === 'block-admin-configure') {
+    $menu_block_key = 'menu_block_' . $form['delta']['#value'] . '_hide_current_page_link';
+    $hide_current_page_link = variable_get($menu_block_key, FALSE);
+    $item['hide_current_page_link'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide menu items that match the current page'),
+      '#default_value' => $hide_current_page_link,
+      '#states' => array(
+        'visible' => array(
+          ':input[name=display_options]' => array('value' => 'advanced'),
+        )
+      )
+    );
+    $form['settings'] = gsb_misc_fixes_associative_insert($form['settings'], 'depth', $item);
+    $form['#submit'][] = 'gsb_misc_fixes_block_admin_configure_submit';
+  }
+}
+
+/**
+ * Submit handler for block_admin_configure form.
+ *  - Save 'Hide current page link' setting.
+ */
+function gsb_misc_fixes_block_admin_configure_submit($form, &$form_state) {
+  $menu_block_key = 'menu_block_' . $form['delta']['#value'] . '_hide_current_page_link';
+  variable_set($menu_block_key, $form_state['values']['hide_current_page_link']);
 }
