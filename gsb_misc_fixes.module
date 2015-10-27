@@ -56,10 +56,12 @@ function gsb_misc_fixes_block_view_alter(&$data, $block) {
   if ($hide_current_page_link) {
     if (arg(0) == 'node' && is_numeric(arg(1))) {
       $nid = arg(1);
-      foreach ($data['content']['#content'] as $key => $value) {
-        if (!empty($data['content']['#content'][$key]['#href']) && $data['content']['#content'][$key]['#href'] == 'node/' . $nid) {
-          unset($data['content']['#content'][$key]);
-          break;
+      if (isset($data['content']['#content'])) {
+        foreach ($data['content']['#content'] as $key => $value) {
+          if (!empty($data['content']['#content'][$key]['#href']) && $data['content']['#content'][$key]['#href'] == 'node/' . $nid) {
+            unset($data['content']['#content'][$key]);
+            break;
+          }
         }
       }
     }
