@@ -110,3 +110,37 @@ function gsb_misc_fixes_block_admin_configure_submit($form, &$form_state) {
   $menu_block_key = 'menu_block_' . $form['delta']['#value'] . '_hide_current_page_link';
   variable_set($menu_block_key, $form_state['values']['hide_current_page_link']);
 }
+
+/**
+ * Creates a csv file from the $fields within $info. 
+ * - Returns: The file $file_name is downloaded after all the rows in the .csv have been written. 
+ */
+ function gsb_misc_fixes_download_info($info, $file_name, $headers, $fields) {
+
+  $fh = @fopen($file_name, 'w'); // The @ suppresses errors.
+
+  // Add a header row
+  @fputcsv($fh, $headers);
+
+  // Loop through our info and write the csv data.
+  foreach($info as $item) {
+    $values = array();
+    foreach ($fields as $field_name) {
+      $values[] = $item->$field_name;
+    }
+    @fputcsv($fh, $values);
+  }
+
+  // Close & save the file.
+  @fclose($fh);
+
+  drupal_add_http_header('Content-Type', 'application/force-download');
+  drupal_add_http_header('Pragma', 'public');
+  drupal_add_http_header('Cache-Control', 'max-age=0');
+
+  @readfile($file_name);  // The @ makes it silent.
+  @unlink($file_name);  // Clean up, the @ makes it silent.
+
+  exit();
+
+}
