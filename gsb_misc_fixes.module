@@ -109,6 +109,9 @@ function gsb_misc_fixes_form_block_admin_configure_alter(&$form, &$form_state) {
  *  - Save 'Hide current page link' setting.
  */
 function gsb_misc_fixes_block_admin_configure_submit($form, &$form_state) {
+  if (empty($form_state['values']['hide_current_page_link'])) {
+    return;
+  }
   $menu_block_key = 'menu_block_' . $form['delta']['#value'] . '_hide_current_page_link';
   variable_set($menu_block_key, $form_state['values']['hide_current_page_link']);
 }
