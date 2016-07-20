@@ -159,8 +159,8 @@ function gsb_misc_fixes_mail_alter(&$message) {
   $from_name = !empty($mimemail_name) ? $mimemail_name : $site_name;
   if ($message['module'] == 'email_contact' && $message['key'] == 'contact' && !empty($message['params']['name'])) {
     $from_name = $message['params']['name'];
-    $message['body'][0] = $from_name . token_replace(' sent a message using the contact form at [current-page:url]');
+    $message['body'][0] = $from_name . token_replace(' sent a message using the contact form at [current-page:url]') . '<br/><br/>';
   }
-  $message['headers']['From'] = $from_name . ' <' . $message['headers']['From'] . '>';
+  $message['headers']['From'] = $from_name . ' <' . $message['from'] . '>';
   $message['from'] = $from_name . ' <' . $message['from'] . '>';
 }
