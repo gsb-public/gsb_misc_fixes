@@ -160,6 +160,11 @@ function gsb_misc_fixes_mail_alter(&$message) {
   if ($message['module'] == 'email_contact' && $message['key'] == 'contact' && !empty($message['params']['name'])) {
     $from_name = $message['params']['name'];
   }
+
+  if (!empty($_GET['destination'])) {
+    $message['body'][0] = str_replace('<br /><br />', '', $message['body'][0]);
+    $message['body'][0] .= 'referred from: <a href="' . $_GET['destination'] . '">' . $_GET['destination'] . '</a> <br /><br />';
+  }
   $message['headers']['From'] = $from_name . ' <' . $message['from'] . '>';
   $message['from'] = $from_name . ' <' . $message['from'] . '>';
 }
