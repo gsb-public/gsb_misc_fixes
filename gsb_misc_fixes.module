@@ -168,3 +168,29 @@ function gsb_misc_fixes_mail_alter(&$message) {
   $message['headers']['From'] = $from_name . ' <' . $message['from'] . '>';
   $message['from'] = $from_name . ' <' . $message['from'] . '>';
 }
+
+/**
+ * Implements hook_countries_alter().
+ */
+function gsb_misc_fixes_countries_alter(&$countries) {
+  // Change the titles for these countries
+  $countries['BS'] = 'Bahamas, The';
+  $countries['CV'] = 'Cabo Verde';
+  $countries['CZ'] = 'Czechia';
+  $countries['FM'] = 'Micronesia, Federated States of';
+  $countries['GM'] = 'Gambia, The';
+  $countries['VA'] = 'Holy See';
+  // Add these countries
+  $countries['BU'] = 'Burma';
+  $countries['CI'] = 'Côte d\'Ivoire';
+  $countries['XK'] = 'Kosovo';
+  // Sort the countries
+  array_multisort(array_map('gsb_misc_fixes_locale_sort', $countries), $countries);
+}
+
+/**
+ * Performs natural (locale) sort, supporting Unicode
+ */
+function gsb_misc_fixes_locale_sort($string) {
+    return preg_replace('~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|tilde|uml);~i', '$1' . chr(255) . '$2', htmlentities($string, ENT_QUOTES, 'UTF-8'));
+}
