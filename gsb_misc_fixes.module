@@ -7,6 +7,12 @@ function gsb_misc_fixes_form_node_form_alter(&$form, &$form_state) {
   $form['#submit'][] = 'gsb_misc_fixes_menufix_node_submit';
 }
 
+function gsb_misc_fixes_form_email_contact_mail_page_form_alter(&$form, &$form_state) {
+  // Turn off google indexing for the email contact form
+  $form['#prefix'] = '<!--googleoff: index--><!--googleoff: snippet-->';
+  $form['#suffix'] = '<!--googleon: snippet--><!--googleon: index-->';
+}
+
 function gsb_misc_fixes_menufix_node_submit($form, &$form_state) {
   if (!user_access('administer menu') && !empty($form['#node']->menu['mlid'])) {
     $form_state['node']->menu['enabled'] = 1;
