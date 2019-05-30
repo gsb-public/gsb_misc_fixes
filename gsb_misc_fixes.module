@@ -1,6 +1,57 @@
 <?php
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function gsb_misc_fixes_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'init') {
+    $group = $implementations['gsb_misc_fixes'];
+    unset($implementations['gsb_misc_fixes']);
+    $implementations['gsb_misc_fixes'] = $group;
+  }
+}
+
+/**
+ * Implements hook_init().
+ */
+function gsb_misc_fixes_init() {
+
+  if (variable_get('gsb_misc_enable_sec_report_uri_callback',false)) {
+    return;
+  }
+
+  $csp_header = drupal_get_http_header('Content-Security-Policy');
+
+  if ($csp_header != null) {
+
+    $uri_start = strpos($csp_header,' report-uri');
+    $uri_end = strpos( $csp_header,';', $uri_start);
+
+    if ($uri_start == false) {
+      return;
+    }
+
+    $part1 = substr($csp_header, 0, $uri_start);
+    $part2 = '';
+    if ($uri_end != false) {
+      $part2 = substr($csp_header, $uri_end+1);
+    }
+
+    header_remove('Content-Security-Policy');
+    header_remove('X-Content-Security-Policy');
+    header_remove('X-WebKit-CSP');
+
+    $csp_header = $part1 . " " . $part2;
+
+    drupal_add_http_header('Content-Security-Policy', $csp_header);
+    drupal_add_http_header('X-Content-Security-Policy', $csp_header);
+    drupal_add_http_header('X-WebKit-CSP', $csp_header);
+
+    $csp_header = drupal_get_http_header('Content-Security-Policy');
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  */
 function gsb_misc_fixes_form_node_form_alter(&$form, &$form_state) {
